@@ -1,47 +1,20 @@
 import telebot
 from telebot import types
-import requests
-from bs4 import BeautifulSoup as bs
+import parser
+
 
 url = 'https://www.pravda.com.ua/rus/news/'
-
 Api_Bot = '5958326152:AAHF6GYtAK1bBuXfxT-qaIHyULYKuESLs5g'
-
 bot = telebot.TeleBot(Api_Bot)
 
+new_ua = parser.new(url)
 
-def new(link):
-    r = requests.get(link)
-    soup = bs(r.text, 'lxml')
-    news = soup.find_all('div', class_='article_header')
-    x = [c.text for c in news]
-    del x[0]
-    return x
+new_ua = parser.new(url)
+
+description = parser.new_description(url)
 
 
-new_ua = new(url)
-
-
-def new_description(link):
-    r = requests.get(link)
-    soup = bs(r.text, 'lxml')
-    news = soup.find_all('div', class_='article_header')
-    a = [x.find('a').get('href') for x in news]
-    link = 'https://www.pravda.com.ua/'
-    lst = []
-    for i in a:
-        if i.find('https') < 0:
-            lst.append(link + i)
-        else:
-            lst.append(i)
-    return lst
-
-
-new_ua = new(url)
-description = new_description(url)
-
-
-@bot.message_handler(commands=['Start'])
+@bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton('Hello 👋')
@@ -50,7 +23,6 @@ def start(message):
     btn4 = types.KeyboardButton('News')
     markup.add(btn1, btn2, btn3, btn4)
     bot.send_message(message.chat.id, f'Hello', reply_markup=markup)
-
 
 @bot.message_handler(content_types=['text'])
 def func(message):
@@ -62,6 +34,15 @@ def func(message):
         btn4 = types.KeyboardButton('News')
         markup.add(btn1, btn2, btn3, btn4)
         bot.send_message(message.chat.id, f'Hello {message.from_user.first_name},thanks for using this bot', reply_markup=markup)
+    elif message.text == '/Start':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton('Hello 👋')
+        btn2 = types.KeyboardButton('How are you')
+        btn3 = types.KeyboardButton('Help')
+        btn4 = types.KeyboardButton('News')
+        markup.add(btn1, btn2, btn3, btn4)
+        bot.send_message(message.chat.id, f'Hello', reply_markup=markup)
+
     elif message.text == 'How are you':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton('Good and you?')
@@ -74,7 +55,19 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton('Back')
         markup.add(btn1)
-        command = '/Start' + '\n' + '\n' + '/Help'
+        command = '/start' + '\n' + '\n' + '/help'
+        bot.send_message(message.chat.id, command, reply_markup=markup)
+    elif message.text == '/Help':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton('Back')
+        markup.add(btn1)
+        command = '/start' + '\n' + '\n' + '/help'
+        bot.send_message(message.chat.id, command, reply_markup=markup)
+    elif message.text == '/help':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton('Back')
+        markup.add(btn1)
+        command = '/start' + '\n' + '\n' + '/help'
         bot.send_message(message.chat.id, command, reply_markup=markup)
     elif message.text == 'Good':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -92,7 +85,7 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn3 = types.KeyboardButton('Back')
         markup.add(btn3)
-        bot.send_message(message.chat.id, "Иди успокойся!", reply_markup=markup)
+        bot.send_message(message.chat.id, "Drink tea!", reply_markup=markup)
     elif message.text == 'Хочешь скину тебе какой нибудь смайл?':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn3 = types.KeyboardButton('Back')
